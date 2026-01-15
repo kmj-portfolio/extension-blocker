@@ -1,0 +1,10 @@
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.field-error {
+    border-color: #dc3545;
+    color: #dc3545;
+}

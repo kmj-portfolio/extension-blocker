@@ -6,16 +6,62 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<div class="container">
     <h1> 파일 확장자 차단</h1>
     <h2> 파일 확장자에 따라 특정 형식의 파일을 첨부하거나 전송하지 못하도록 제한 </h2>
 
+    <!-- 고정 확장자 -->
     <section>
         <h3> 고정 확장자 </h3>
+        <form id="fixedExtensionForm" th:action="@{/ui/fixed-extensions}" method="post">
+            <div th:each="ext : ${data.fixedExtensionList()}">
+                <label>
+                    <input type = "checkbox"
+                           name = "blockedFixedExtensionList"
+                           th:value="${ext.id}"
+                           th:checked="${ext.blocked}"
+                           onchange="this.form.submit()">
+                    <span th:text="${ext.extensionName()}">extension name</span>
+                </label>
+            </div>
+        </form>
     </section>
 
+
+    <!--커스텀 확장자-->
     <section>
-        <h3> 커스텀 확장자 </h3>
-    </section>
+        <h3>커스텀 확장자</h3>
+        <p>
+            <span th:text="${data.customExtensionCount()}">0</span>
+            /
+            <span th:text="${data.customExtensionLimit()}">200</span>
+        </p>
 
+        <!--커스텀 확장자 추가-->
+        <form th:action="@{/ui/custom-extensions}" method="post" th:object="${form}">
+            <input type="text"
+                   th:field="*{extensionName}"
+                   placeholder="확장자 입력 (최대 20자)"
+                   th:errorclass="field-error"
+                   required>
+
+            <button type="submit">추가</button>
+            <p th:if="${#fields.hasErrors('extensionName')}"
+               th:errors="*{extensionName}"
+               style="color:red;"></p>
+        </form>
+
+        <!-- 커스텀 확장자 목록 -->
+        <ul>
+            <li th:each="ext: ${data.customExtensionList()}">
+                <span th:text="${ext.extensionName()}">sh</span>
+
+                <form th:action="@{|/ui/custom-extensions/${ext.id}/delete|}" method="post" style="display:inline">
+                <button type="submit">x</button>
+                </form>
+            </li>
+        </ul>
+    </section>
+</div>
 </body>
 </html>
