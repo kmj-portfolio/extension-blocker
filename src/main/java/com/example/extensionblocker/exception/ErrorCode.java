@@ -11,6 +11,7 @@ public enum ErrorCode {
     EXTENSION_DOES_NOT_EXIST(HttpStatus.NOT_FOUND, "존재하지 않는 확장자입니다."),
     NO_CUSTOM_EXTENSION(HttpStatus.NOT_FOUND, "커스텀 확장자가 없습니다."),
     MAX_CUSTOM_EXTENSION_EXCEEDED(HttpStatus.CONFLICT, "200개 이상의 커스텀 확장자를 등록할 수 없습니다."),
+    ILLEGAL_ARGUMENT_EXCEPTION(HttpStatus.BAD_REQUEST, "범위 내의 값을 입력해주세요."),
 
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류");
 

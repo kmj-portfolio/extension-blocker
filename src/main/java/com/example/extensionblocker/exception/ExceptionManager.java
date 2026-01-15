@@ -15,12 +15,21 @@ public class ExceptionManager {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> RuntimeExceptionHandler(RuntimeException e) {
+    public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
         ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ErrorResponse.of(errorCode));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> illegalArgumentExceptionHandler(IllegalArgumentException e) {
+        ErrorCode errorCode = ErrorCode.ILLEGAL_ARGUMENT_EXCEPTION;
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ErrorResponse.of(errorCode, e.getMessage()));
     }
 
 }
