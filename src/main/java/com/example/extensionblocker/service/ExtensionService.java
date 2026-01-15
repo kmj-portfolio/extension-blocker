@@ -1,9 +1,8 @@
 package com.example.extensionblocker.service;
 
+import com.example.extensionblocker.dto.request.BlockFixedExtensionRequest;
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
-import com.example.extensionblocker.dto.response.BlockedExtensionResponse;
-import com.example.extensionblocker.dto.response.CustomExtensionResponse;
-import com.example.extensionblocker.dto.response.ExtensionListResponse;
+import com.example.extensionblocker.dto.response.*;
 import com.example.extensionblocker.entity.CustomExtensionEntity;
 import com.example.extensionblocker.entity.FixedExtensionEntity;
 import com.example.extensionblocker.exception.ErrorCode;
@@ -15,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class ExtensionService {
 
     @Transactional(readOnly = true)
     public ExtensionListResponse getAllExtensions() {
+
         List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findAll();
         List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
 
@@ -35,10 +37,18 @@ public class ExtensionService {
 
     @Transactional(readOnly = true)
     public BlockedExtensionResponse getBlockedExtensions() {
+
         List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findByBlockedIsTrue();
         List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
 
         return extensionMapper.toBlockedExtensionResponse(fixedExtensionEntityList, customExtensionEntityList);
+    }
+
+    @Transactional(readOnly = true)
+    public CustomExtensionListResponse getCustomExtensionList() {
+
+        List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
+        return extensionMapper.toCustomExtensionListResponse(customExtensionEntityList);
     }
 
     @Transactional
@@ -66,12 +76,50 @@ public class ExtensionService {
     }
 
     @Transactional
+    public FixedExtensionListResponse changeFixedExtensionStatus(BlockFixedExtensionRequest request) {
+
+        // 차단 요청된 ID들이 존재하는 지 검증
+        Set<Integer> requestedIdSet = validateRequestedIds(request.blockedFixedExtensionList());
+
+        // 모든 고정 확장자 조회
+        List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findAll();
+
+        // 고정 확장자가 차단 요청 목록에 있으면 block, 없으면 unblock
+        for (FixedExtensionEntity fixedExtension : fixedExtensionEntityList) {
+
+            boolean blockRequested = requestedIdSet.contains(fixedExtension.getId());
+
+            if (blockRequested) {
+                fixedExtension.block();
+            } else {
+                fixedExtension.unblock();
+            }
+        }
+        return extensionMapper.toFixedExtensionListResponse(fixedExtensionEntityList);
+    }
+
+
+    @Transactional
     public void deleteCustomExtension(Integer id) {
 
         if (!customExtensionRepository.existsById(id)) {
             throw new ExtensionException(ErrorCode.EXTENSION_DOES_NOT_EXIST);
         }
         customExtensionRepository.deleteById(id);
+    }
+
+    // 존재하지 않는 확장자가 request에 포함되어 있는지 확인
+    private Set<Integer> validateRequestedIds(List<Integer> requestedIds) {
+
+        Set<Integer> requestedIdSet = new HashSet<>(requestedIds);
+        List<FixedExtensionEntity> foundFixedEntityList = fixedExtensionRepository.findAllById(requestedIds);
+
+        // 요청된 ID 수 중 DB에 존재하는 ID의 개수를 확인
+        if (foundFixedEntityList.size() != requestedIds.size()) {
+            throw new ExtensionException(ErrorCode.EXTENSION_DOES_NOT_EXIST);
+        }
+
+        return requestedIdSet;
     }
 
     private String normalize(String value) {
@@ -81,10 +129,11 @@ public class ExtensionService {
     }
 
     private void validate(String value) {
+
         if (!value.matches("^[a-zA-Z0-9_-]+$")) {
             throw new ExtensionException(
                     ErrorCode.ILLEGAL_ARGUMENT_EXCEPTION,
-                    "확장자는 영문과 숫자로만 입력해주세요.");
+                    "확장자는 영문과 숫자, '-'와 '_'로만 입력해주세요.");
         }
     }
 }
