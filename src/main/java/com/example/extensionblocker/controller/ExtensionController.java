@@ -1,6 +1,7 @@
 package com.example.extensionblocker.controller;
 
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
+import com.example.extensionblocker.dto.response.BlockedExtensionResponse;
 import com.example.extensionblocker.dto.response.CustomExtensionResponse;
 import com.example.extensionblocker.dto.response.ExtensionListResponse;
 import com.example.extensionblocker.service.ExtensionService;
@@ -40,6 +41,15 @@ public class ExtensionController {
         ExtensionListResponse response = extensionService.getAllExtensions();
 
         return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/blocked")
+    public ResponseEntity<BlockedExtensionResponse> getBlockedExtensions() {
+        BlockedExtensionResponse response = extensionService.getBlockedExtensions();
+
+        return  ResponseEntity
                 .status(HttpStatus.OK)
                 .body(response);
     }

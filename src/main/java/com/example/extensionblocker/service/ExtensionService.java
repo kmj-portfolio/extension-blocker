@@ -1,6 +1,7 @@
 package com.example.extensionblocker.service;
 
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
+import com.example.extensionblocker.dto.response.BlockedExtensionResponse;
 import com.example.extensionblocker.dto.response.CustomExtensionResponse;
 import com.example.extensionblocker.dto.response.ExtensionListResponse;
 import com.example.extensionblocker.entity.CustomExtensionEntity;
@@ -30,6 +31,14 @@ public class ExtensionService {
         List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
 
         return extensionMapper.toExtensionListResponse(fixedExtensionEntityList, customExtensionEntityList);
+    }
+
+    @Transactional(readOnly = true)
+    public BlockedExtensionResponse getBlockedExtensions() {
+        List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findByBlockedIsTrue();
+        List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
+
+        return extensionMapper.toBlockedExtensionResponse(fixedExtensionEntityList, customExtensionEntityList);
     }
 
     @Transactional

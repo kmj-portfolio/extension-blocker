@@ -1,5 +1,6 @@
 package com.example.extensionblocker.mapper;
 
+import com.example.extensionblocker.dto.response.BlockedExtensionResponse;
 import com.example.extensionblocker.dto.response.CustomExtensionResponse;
 import com.example.extensionblocker.dto.response.ExtensionListResponse;
 import com.example.extensionblocker.dto.response.FixedExtensionResponse;
@@ -7,6 +8,7 @@ import com.example.extensionblocker.entity.CustomExtensionEntity;
 import com.example.extensionblocker.entity.FixedExtensionEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,5 +48,23 @@ public class ExtensionMapper {
                 customExtensionEntityList.size(),
                 CUSTOM_EXTENSION_LIMIT
         );
+    }
+
+    public BlockedExtensionResponse toBlockedExtensionResponse(List<FixedExtensionEntity> fixedExtensionEntityList,
+                                    List<CustomExtensionEntity> customExtensionEntityList) {
+
+        List<String> fixed = fixedExtensionEntityList.stream()
+                .map(FixedExtensionEntity::getExtensionName)
+                .toList();
+
+        List<String> custom = customExtensionEntityList.stream()
+                .map(CustomExtensionEntity::getExtensionName)
+                .toList();
+
+        List<String> result = new ArrayList<>();
+        result.addAll(fixed);
+        result.addAll(custom);
+
+        return new BlockedExtensionResponse(result);
     }
 }
