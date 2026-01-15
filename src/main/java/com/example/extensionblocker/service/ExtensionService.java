@@ -78,8 +78,19 @@ public class ExtensionService {
     @Transactional
     public FixedExtensionListResponse changeFixedExtensionStatus(BlockFixedExtensionRequest request) {
 
-        // 차단 요청된 ID들이 존재하는 지 검증
-        Set<Integer> requestedIdSet = validateRequestedIds(request.blockedFixedExtensionList());
+        List<Integer> blockedList = request.blockedFixedExtensionList();
+        if (blockedList == null) {
+            blockedList = List.of();
+        }
+
+        Set<Integer> requestedIdSet;
+
+        if (blockedList.isEmpty()) {
+            requestedIdSet =  new HashSet<>();
+        } else {
+            // 차단 요청된 ID들이 존재하는 지 검증
+            requestedIdSet = validateRequestedIds(blockedList);
+        }
 
         // 모든 고정 확장자 조회
         List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findAll();
