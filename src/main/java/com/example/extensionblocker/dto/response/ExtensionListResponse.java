@@ -6,6 +6,6 @@ public record ExtensionListResponse(
         List<FixedExtensionResponse> fixedExtensionList,
         List<CustomExtensionResponse> customExtensionList,
         Integer customExtensionCount,
-        Integer CustomExtensionLimit
+        Integer customExtensionLimit
 ) {
 }
