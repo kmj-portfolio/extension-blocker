@@ -1,4 +1,4 @@
-package com.example.extensionblocker.controller;
+package com.example.extensionblocker.controller.api;
 
 import com.example.extensionblocker.dto.request.BlockFixedExtensionRequest;
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/extensions")
-public class ExtensionController {
+public class ExtensionRestController {
 
     private final ExtensionService extensionService;
 
