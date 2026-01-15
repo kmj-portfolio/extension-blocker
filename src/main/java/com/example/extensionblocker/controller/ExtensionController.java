@@ -2,6 +2,7 @@ package com.example.extensionblocker.controller;
 
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
 import com.example.extensionblocker.dto.response.CustomExtensionResponse;
+import com.example.extensionblocker.dto.response.ExtensionListResponse;
 import com.example.extensionblocker.service.ExtensionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,19 @@ public class ExtensionController {
 
     @DeleteMapping("/customs/{id}")
     public ResponseEntity<Void> deleteCustomExtension(@PathVariable Integer id) {
-
         extensionService.deleteCustomExtension(id);
 
         return ResponseEntity
                 .noContent()
                 .build();
+    }
+
+    @GetMapping
+    public ResponseEntity<ExtensionListResponse> getAllExtensions() {
+        ExtensionListResponse response = extensionService.getAllExtensions();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }

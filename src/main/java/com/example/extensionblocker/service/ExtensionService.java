@@ -2,7 +2,9 @@ package com.example.extensionblocker.service;
 
 import com.example.extensionblocker.dto.request.CreateCustomExtensionRequest;
 import com.example.extensionblocker.dto.response.CustomExtensionResponse;
+import com.example.extensionblocker.dto.response.ExtensionListResponse;
 import com.example.extensionblocker.entity.CustomExtensionEntity;
+import com.example.extensionblocker.entity.FixedExtensionEntity;
 import com.example.extensionblocker.exception.ErrorCode;
 import com.example.extensionblocker.exception.ExtensionException;
 import com.example.extensionblocker.mapper.ExtensionMapper;
@@ -12,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExtensionService {
@@ -19,6 +23,14 @@ public class ExtensionService {
     private final FixedExtensionRepository fixedExtensionRepository;
     private final CustomExtensionRepository customExtensionRepository;
     private final ExtensionMapper extensionMapper;
+
+    @Transactional(readOnly = true)
+    public ExtensionListResponse getAllExtensions() {
+        List<FixedExtensionEntity> fixedExtensionEntityList = fixedExtensionRepository.findAll();
+        List<CustomExtensionEntity> customExtensionEntityList = customExtensionRepository.findAll();
+
+        return extensionMapper.toExtensionListResponse(fixedExtensionEntityList, customExtensionEntityList);
+    }
 
     @Transactional
     public CustomExtensionResponse createCustomExtension(CreateCustomExtensionRequest request) {
