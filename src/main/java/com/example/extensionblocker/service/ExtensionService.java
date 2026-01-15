@@ -10,6 +10,7 @@ import com.example.extensionblocker.repository.CustomExtensionRepository;
 import com.example.extensionblocker.repository.FixedExtensionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class ExtensionService {
     private final CustomExtensionRepository customExtensionRepository;
     private final ExtensionMapper extensionMapper;
 
+    @Transactional
     public CustomExtensionResponse createCustomExtension(CreateCustomExtensionRequest request) {
 
         // 현재 커스텀 확장자가 200개 미만인지 확인
@@ -40,6 +42,15 @@ public class ExtensionService {
         customExtensionRepository.save(customExtension);
 
         return extensionMapper.toCustomExtensionResponse(customExtension);
+    }
+
+    @Transactional
+    public void deleteCustomExtension(Integer id) {
+
+        if (!customExtensionRepository.existsById(id)) {
+            throw new ExtensionException(ErrorCode.EXTENSION_DOES_NOT_EXIST);
+        }
+        customExtensionRepository.deleteById(id);
     }
 
     private String normalize(String value) {
